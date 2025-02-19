@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Guess Who? - Slideshow</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #0a1931, #161d6f, #0a1931);
+            color: white;
+            text-align: center;
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            touch-action: manipulation;
+        }
+        .start-screen, .countdown-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #0a1931, #161d6f);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            z-index: 10;
+        }
+        .start-btn {
+            font-size: 30px;
+            font-weight: bold;
+            padding: 15px 30px;
+            color: gold;
+            background: transparent;
+            border: 3px solid gold;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .start-btn:hover {
+            background: gold;
+            color: black;
+            box-shadow: 0px 0px 10px gold;
+        }
+        .countdown-number {
+            font-size: 150px;
+            font-weight: bold;
+            color: gold;
+            text-shadow: 0px 0px 30px gold;
+        }
+        .slideshow-container {
+            position: relative;
+            width: 300px;
+            height: 300px;
+            display: none;
+        }
+        .slide {
+            display: none;
+        }
+        img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* Keeps 1:1 aspect ratio */
+            border-radius: 10px;
+            box-shadow: 0px 0px 20px rgba(255, 215, 0, 0.8);
+        }
+        .nav-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+            visibility: hidden;
+        }
+        .nav-btn {
+            cursor: pointer;
+            padding: 15px 30px;
+            font-size: 25px;
+            font-weight: bold;
+            color: gold;
+            background: transparent;
+            border: 3px solid gold;
+            border-radius: 10px;
+            margin: 10px;
+            transition: 0.3s;
+        }
+        .nav-btn:hover {
+            background: gold;
+            color: black;
+            box-shadow: 0px 0px 10px gold;
+        }
+        @media (max-width: 768px) {
+            .countdown-number {
+                font-size: 100px;
+            }
+            .slideshow-container {
+                width: 250px;
+                height: 250px;
+            }
+            .nav-btn {
+                font-size: 20px;
+                padding: 10px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Home Screen -->
+    <div class="start-screen" id="startScreen">
+        <h1>Guess Who?</h1>
+        <button class="start-btn" onclick="startGame()">Start</button>
+    </div>
+
+    <!-- Countdown Animation -->
+    <div class="countdown-screen" id="countdownScreen" style="display: none;">
+        <div class="countdown-number" id="countdown">3</div>
+    </div>
+
+    <!-- Slideshow Area -->
+    <div class="slideshow-container" id="slideshowContainer">
+        <div class="slide"><img src="child1.jpg"></div>
+        <div class="slide"><img src="child2.jpg"></div>
+        <div class="slide"><img src="child3.jpg"></div>
+        <div class="slide"><img src="child4.jpg"></div>
+        <div class="slide"><img src="child5.jpg"></div>
+        <div class="slide"><img src="child6.jpg"></div>
+        <div class="slide"><img src="child7.jpg"></div>
+        <div class="slide"><img src="child8.jpg"></div>
+        <div class="slide"><img src="child9.jpg"></div>
+        <div class="slide"><img src="child10.jpg"></div>
+        <div class="slide"><img src="child11.jpg"></div>
+        <div class="slide"><img src="child12.jpg"></div>
+        <div class="slide"><img src="child13.jpg"></div>
+    </div>
+
+    <!-- Navigation Buttons -->
+    <div class="nav-container" id="navContainer">
+        <button class="nav-btn" onclick="changeSlide(-1)">⏪ Previous</button>
+        <button class="nav-btn" onclick="changeSlide(1)">Next ⏩</button>
+    </div>
+
+    <audio id="beep" src="beep.mp3"></audio>
+    <audio id="revealSound" src="reveal.mp3"></audio>
+
+    <script>
+        let slideIndex = 0;
+        let slides = document.querySelectorAll(".slide");
+        let startScreen = document.getElementById("startScreen");
+        let countdownScreen = document.getElementById("countdownScreen");
+        let slideshowContainer = document.getElementById("slideshowContainer");
+        let countdownElem = document.getElementById("countdown");
+        let navContainer = document.getElementById("navContainer");
+        let beepSound = document.getElementById("beep");
+        let revealSound = document.getElementById("revealSound");
+
+        function startGame() {
+            startScreen.style.display = "none";
+            startCountdown(() => showSlide(slideIndex)); // Countdown before first slide
+        }
+
+        function startCountdown(callback) {
+            countdownScreen.style.display = "flex";
+            navContainer.style.visibility = "hidden"; // Hide navigation buttons
+            let count = 3;
+            countdownElem.innerText = count;
+
+            let countdownInterval = setInterval(() => {
+                beepSound.play();
+                count--;
+                if (count > 0) {
+                    countdownElem.innerText = count;
+                } else {
+                    clearInterval(countdownInterval);
+                    countdownScreen.style.display = "none";
+                    callback(); // Show image after countdown
+                }
+            }, 1000);
+        }
+
+        function showSlide(index) {
+            slides.forEach(slide => slide.style.display = "none");
+            if (index >= slides.length) slideIndex = 0;
+            if (index < 0) slideIndex = slides.length - 1;
+
+            slideshowContainer.style.display = "block";
+            slides[slideIndex].style.display = "block";
+            navContainer.style.visibility = "visible"; // Show navigation buttons
+            revealSound.play();
+        }
+
+        function changeSlide(n) {
+            slideIndex += n;
+            startCountdown(() => showSlide(slideIndex)); // Countdown before each image
+        }
+    </script>
+
+</body>
+</html>
