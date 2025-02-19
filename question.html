@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KBC Quiz</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@600&display=swap');
+
+        body {
+            font-family: 'Orbitron', sans-serif;
+            text-align: center;
+            background: radial-gradient(circle, #000428, #004e92);
+            color: white;
+            margin: 0;
+            padding: 20px;
+            overflow: hidden;
+        }
+
+        #start-page {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, #000428, #004e92);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        #start-button {
+            padding: 15px 30px;
+            font-size: 24px;
+            background: gold;
+            border: 3px solid white;
+            color: #000;
+            cursor: pointer;
+            border-radius: 10px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        #start-button:hover {
+            box-shadow: 0 0 15px gold;
+        }
+
+        #quiz-container {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        h1 {
+            font-size: 32px;
+            text-shadow: 2px 2px 10px rgba(255, 255, 255, 0.5);
+        }
+
+        #name-container {
+            font-size: 48px;
+            font-weight: bold;
+            color: gold;
+            text-shadow: 3px 3px 15px rgba(255, 215, 0, 0.8);
+            opacity: 0;
+            transform: scale(0);
+            transition: opacity 1.5s ease-in-out, transform 1.5s ease-in-out;
+            display: inline-block;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+
+        #question-box {
+            display: none;
+            margin-top: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 20px;
+            border-radius: 10px;
+            width: 80%;
+            max-width: 500px;
+            font-size: 22px;
+            border: 2px solid gold;
+            text-shadow: 1px 1px 10px rgba(255, 255, 255, 0.4);
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        #next-button {
+            display: none;
+            margin-top: 30px;
+            padding: 15px 30px;
+            font-size: 22px;
+            background: gold;
+            border: 2px solid white;
+            color: #000;
+            cursor: pointer;
+            border-radius: 10px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        #next-button:hover {
+            box-shadow: 0 0 15px gold;
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- Start Page -->
+    <div id="start-page">
+        <h1>🎉 Welcome to KBC Quiz 🎉</h1>
+        <button id="start-button" onclick="startQuiz()">Start Quiz</button>
+    </div>
+
+    <!-- Quiz Container -->
+    <div id="quiz-container">
+        <h1>🎤 Let's Play Kaun Banega Crorepati! 🎤</h1>
+
+        <div id="name-container"></div>
+
+        <div id="question-box">
+            <p id="question-text"></p>
+        </div>
+
+        <button id="next-button" onclick="showNextStudent()">Next</button>
+    </div>
+
+    <audio id="revealSound" src="reveal.mp3"></audio>
+    <audio id="questionSound" src="kbc_question.mp3"></audio>
+
+    <script>
+        const students = [
+            { name: "Rahul", question: "What is the capital of India?" },
+            { name: "Sneha", question: "Who discovered gravity?" },
+            { name: "Amit", question: "What is the chemical formula of water?" },
+            { name: "Riya", question: "Who wrote the national anthem of India?" },
+            { name: "Vikram", question: "What is the square root of 144?" },
+            { name: "Neha", question: "Which is the longest river in the world?" },
+            { name: "Kunal", question: "What is the capital of Japan?" },
+            { name: "Pooja", question: "Who is known as the 'Missile Man of India'?" },
+            { name: "Aryan", question: "Which planet is known as the Red Planet?" },
+            { name: "Isha", question: "What is the national animal of India?" },
+            { name: "Rohan", question: "Who was the first Prime Minister of India?" },
+            { name: "Meera", question: "What is the largest ocean on Earth?" },
+            { name: "Kabir", question: "Which gas is essential for breathing?" }
+        ];
+
+        let currentIndex = 0;
+
+        function startQuiz() {
+            document.getElementById("start-page").style.display = "none";
+            document.getElementById("quiz-container").style.display = "flex";
+            showNextStudent();
+        }
+
+        function showNextStudent() {
+            if (currentIndex >= students.length) {
+                alert("Quiz Completed!");
+                return;
+            }
+
+            let student = students[currentIndex];
+            let nameContainer = document.getElementById("name-container");
+
+            nameContainer.textContent = student.name;
+            nameContainer.style.opacity = "0";
+            nameContainer.style.transform = "scale(0)";
+
+            document.getElementById("question-box").style.display = "none";
+            document.getElementById("next-button").style.display = "none";
+
+            setTimeout(() => {
+                document.getElementById("revealSound").play();
+                nameContainer.style.opacity = "1";
+                nameContainer.style.transform = "scale(1)";
+            }, 500);
+
+            setTimeout(() => showQuestion(student.question), 3000);
+        }
+
+        function showQuestion(question) {
+            document.getElementById("question-text").textContent = question;
+            document.getElementById("question-box").style.display = "block";
+            document.getElementById("questionSound").play();
+
+            setTimeout(() => {
+                document.getElementById("next-button").style.display = "inline-block";
+            }, 2000);
+
+            currentIndex++;
+        }
+    </script>
+
+</body>
+</html>
